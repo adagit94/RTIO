@@ -1,6 +1,4 @@
-module RTIO
-
-// module github.com/adagit94/RTIO
+module github.com/adagit94/RTIO
 
 go 1.25.5
 
