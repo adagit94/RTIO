@@ -9,9 +9,10 @@ import (
 type Client struct {
 	Hub             *Hub
 	Conn            *ws.Conn
-	ReadSizeLimit   int64
 	PingInterval    time.Duration
 	PongWait        time.Duration
+	ReadSizeLimit   int64
+	WriteMessageType int
 	MessagesToSend  chan []byte
 	ValidateMessage func(msg []byte, client *Client) (bool, []byte)
 }
@@ -80,7 +81,7 @@ func (c *Client) WriteMessages() {
 				return
 			}
 
-			writer, err := c.Conn.NextWriter(ws.TextMessage)
+			writer, err := c.Conn.NextWriter(c.WriteMessageType)
 
 			if err != nil {
 				fmt.Println("[ERR] Failed to retrieve next writer:", err)
