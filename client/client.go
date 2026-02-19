@@ -2,8 +2,8 @@ package client
 
 import (
 	"fmt"
+	"github.com/adagit94/RTIO/helpers"
 	ws "github.com/fasthttp/websocket"
-	"github/adagit94/RTIO/helpers"
 	"time"
 )
 
@@ -60,13 +60,12 @@ func InitClientReader(conn *ws.Conn, pingInterval time.Duration, pongWait time.D
 		})
 
 		for {
-			select {
-			case <-ticker.C:
-				if err := conn.WriteMessage(ws.PingMessage, nil); err != nil {
-					fmt.Println("[ERR] Attempt to write ping message failed:", err)
-				} else {
-					conn.SetReadDeadline(time.Now().Add(pongWait))
-				}
+			<-ticker.C
+
+			if err := conn.WriteMessage(ws.PingMessage, nil); err != nil {
+				fmt.Println("[ERR] Attempt to write ping message failed:", err)
+			} else {
+				conn.SetReadDeadline(time.Now().Add(pongWait))
 			}
 		}
 	}
