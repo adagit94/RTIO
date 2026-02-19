@@ -1,26 +1,25 @@
-package rtio
+package server
 
 import (
 	"fmt"
-	"time"
+	"github.com/adagit94/RTIO/helpers"
 	ws "github.com/fasthttp/websocket"
+	"time"
 )
 
 type Client struct {
-	Hub             *Hub
-	Conn            *ws.Conn
-	PingInterval    time.Duration
-	PongWait        time.Duration
-	ReadSizeLimit   int64
+	Hub              *Hub
+	Conn             *ws.Conn
+	PingInterval     time.Duration
+	PongWait         time.Duration
+	ReadSizeLimit    int64
 	WriteMessageType int
-	MessagesToSend  chan []byte
-	ValidateMessage func(msg []byte, client *Client) (bool, []byte)
+	MessagesToSend   chan []byte
+	ValidateMessage  func(msg []byte, client *Client) (bool, []byte)
 }
 
 func (c *Client) CloseConn() {
-	if err := c.Conn.Close(); err != nil {
-		fmt.Println("[ERR] Attempt to close connection failed:", err)
-	}
+	helpers.CloseConn(c.Conn)
 }
 
 func (c *Client) ReadMessages() {
@@ -39,7 +38,7 @@ func (c *Client) ReadMessages() {
 		_, msg, err := c.Conn.ReadMessage()
 
 		if err != nil {
-			if ws.IsUnexpectedCloseError(err, ws.CloseGoingAway, ws.CloseAbnormalClosure) {
+			if ws.IsUnexpectedCloseError(err, ws.CloseMessage, ws.CloseGoingAway, ws.CloseAbnormalClosure, ws.CloseNormalClosure) {
 				fmt.Println("[ERR] Attempt to read message failed:", err)
 			}
 
@@ -52,13 +51,7 @@ func (c *Client) ReadMessages() {
 					continue
 				}
 
-				select {
-				case client.MessagesToSend <- vMsg:
-
-				default:
-					fmt.Println("[ERR] Failed to sent mesage into the clients channel.")
-					c.Hub.ClearClient(client)
-				}
+				client.MessagesToSend <- vMsg
 			}
 		}
 	}
@@ -68,8 +61,8 @@ func (c *Client) WriteMessages() {
 	ticker := time.NewTicker(c.PingInterval)
 
 	defer func() {
-		ticker.Stop()
 		c.Hub.Unsubscribe <- c
+		ticker.Stop()
 		c.CloseConn()
 	}()
 
