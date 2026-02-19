@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"github.com/adagit94/RTIO/helpers"
+	"github.com/adagit94/RTIO/wio/helpers"
 	ws "github.com/fasthttp/websocket"
 	"time"
 )
