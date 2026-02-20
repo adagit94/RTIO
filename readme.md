@@ -1,3 +1,3 @@
-# WIO (WebSockets Input Output)
+# RIO (Real-Time Input Output)
 
-Engine for broadcasting based communication.
+Monorepo for various approaches to "real-time" communication.

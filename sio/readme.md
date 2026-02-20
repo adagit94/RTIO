@@ -1,3 +1,3 @@
-# RTIO (Real Time Input Output)
+# SIO (Streams Input Output)
 
-Monorepo for various approaches to "real-time" communication.
+Engine for directing streams flows.
