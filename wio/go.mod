@@ -1,4 +1,4 @@
-module github.com/adagit94/RTIO/wio
+module github.com/adagit94/rio/wio
 
 go 1.25.5
 
